@@ -1,0 +1,759 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>🌸 הגן הקסום של מעייני</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Varela+Round&display=swap');
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+:root{--pink:#f5b8c4;--lavender:#c9b8e8;--yellow:#fce588;--peach:#fdd5b1;--mint:#b5e8d5;--white:#fff;--text:#6b5b7b}
+body{font-family:'Varela Round',sans-serif;overflow:hidden;height:100dvh;width:100vw;background:#d4eaf7;touch-action:manipulation;user-select:none;-webkit-user-select:none}
+
+.bsd{position:fixed;top:10px;right:14px;font-size:15px;color:#9b8bab;z-index:9999;font-weight:bold;pointer-events:none}
+
+#main-screen{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;background:linear-gradient(180deg,#d4eaf7 0%,#f0f7ff 60%,#a8d5a2 60%,#7bc47a 100%);z-index:100;transition:opacity .8s ease;overflow-y:auto;padding:30px 0}
+#main-screen.hidden{opacity:0;pointer-events:none}
+.main-title{font-size:clamp(26px,6.5vw,44px);color:var(--text);margin-bottom:6px;text-align:center;animation:floatT 3s ease-in-out infinite}
+@keyframes floatT{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+.main-subtitle{font-size:clamp(15px,3.8vw,20px);color:#8b7b9b;margin-bottom:24px;text-align:center}
+.activity-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;padding:0 16px;max-width:480px;width:100%}
+.activity-btn{background:var(--white);border:3px solid transparent;border-radius:22px;padding:16px 6px;display:flex;flex-direction:column;align-items:center;gap:6px;cursor:pointer;transition:all .3s ease;box-shadow:0 4px 15px rgba(0,0,0,.06)}
+.activity-btn:hover,.activity-btn:active{transform:scale(1.05);box-shadow:0 6px 20px rgba(0,0,0,.1)}
+.activity-btn:nth-child(1){border-color:var(--pink)}.activity-btn:nth-child(2){border-color:#d4a574}.activity-btn:nth-child(3){border-color:var(--lavender)}
+.activity-btn:nth-child(4){border-color:var(--mint)}.activity-btn:nth-child(5){border-color:var(--yellow)}.activity-btn:nth-child(6){border-color:#a8c8e8}.activity-btn:nth-child(7){border-color:#b8b0d8}.activity-btn:nth-child(8){border-color:var(--peach)}.activity-btn:nth-child(9){border-color:#e8a8c8}.activity-btn:nth-child(10){border-color:#a8d8c8}
+.activity-icon{font-size:36px;display:block;height:40px;line-height:40px;text-align:center}.activity-label{font-size:clamp(12px,3vw,16px);color:var(--text);font-weight:bold;text-align:center}
+
+.screen{position:absolute;inset:0;display:flex;flex-direction:column;opacity:0;pointer-events:none;transition:opacity .6s ease}
+.screen.active{opacity:1;pointer-events:all}
+.back-btn{position:fixed;top:12px;left:12px;z-index:200;width:46px;height:46px;border-radius:50%;background:var(--white);border:2px solid var(--pink);font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 3px 10px rgba(0,0,0,.1);transition:transform .2s}
+.back-btn:active{transform:scale(.9)}
+
+/* GARDEN */
+#garden-screen{background:linear-gradient(180deg,#e8f4f8 0%,#d4eaf7 40%,#c5e6c0 40%,#a8d5a2 100%)}
+.garden-canvas{flex:1;position:relative;overflow:hidden}
+.hint-text{position:absolute;bottom:20px;width:100%;text-align:center;font-size:clamp(14px,3.5vw,18px);animation:pulse 2s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:.6}50%{opacity:1}}
+.flower{position:absolute;display:flex;flex-direction:column;align-items:center;animation:grow .8s cubic-bezier(.34,1.56,.64,1) forwards;transform-origin:bottom center;cursor:pointer}
+@keyframes grow{0%{transform:scale(0) translateY(20px);opacity:0}100%{transform:scale(1) translateY(0);opacity:1}}
+.flower-head{font-size:clamp(32px,8vw,56px);transition:transform .3s ease;filter:drop-shadow(0 2px 4px rgba(0,0,0,.1))}
+.flower:hover .flower-head,.flower:active .flower-head{transform:scale(1.3) rotate(10deg)}
+.flower-stem{width:3px;height:30px;background:#7bc47a;border-radius:2px;margin-top:-4px}
+
+/* WALKING GIRL */
+.garden-girl{position:absolute;bottom:5%;z-index:20;pointer-events:none;transition:none}
+.girl-container{display:flex;flex-direction:column;align-items:center;animation:girlBob 0.6s ease-in-out infinite}
+@keyframes girlBob{0%,100%{transform:translateY(0)}50%{transform:translateY(-4px)}}
+.girl-head-emoji{font-size:36px;line-height:1;margin-bottom:-6px;filter:drop-shadow(0 2px 4px rgba(0,0,0,.1))}
+.girl-dress-top{width:34px;height:20px;background:#f5b8c4;border-radius:8px 8px 0 0;position:relative;display:flex;align-items:center;justify-content:center}
+.girl-dress-top::after{content:'🌸';font-size:10px}
+.girl-dress-bot{width:44px;height:16px;background:#f5b8c4;border-radius:0 0 16px 16px;border-top:2px solid #f0a0b4}
+.girl-arms{display:flex;justify-content:space-between;width:42px;position:absolute;top:0;left:-4px}
+.girl-arm{width:7px;height:18px;background:linear-gradient(to bottom,#f5b8c4 50%,#fddcb5 50%);border-radius:4px;transform-origin:top center}
+.girl-arm.l{transform:rotate(-10deg)}.girl-arm.r{transform:rotate(10deg)}
+.girl-hand{width:8px;height:8px;background:#fddcb5;border-radius:50%;margin-top:-2px}
+.girl-flower-hand{position:absolute;top:-8px;right:-14px;font-size:14px;transform:rotate(15deg)}
+.girl-legs{display:flex;gap:4px;margin-top:1px}
+.girl-leg{width:9px;height:20px;background:linear-gradient(to bottom,#fddcb5 60%,#e88bab 60%);border-radius:0 0 4px 4px;transform-origin:top center}
+.girl-leg.l{animation:gLegW 0.6s ease-in-out infinite}
+.girl-leg.r{animation:gLegW 0.6s ease-in-out infinite 0.3s}
+@keyframes gLegW{0%,100%{transform:rotate(0)}25%{transform:rotate(15deg)}75%{transform:rotate(-15deg)}}
+.girl-name{font-size:11px;color:#6b5b7b;font-weight:bold;margin-top:4px;background:rgba(255,255,255,.7);padding:2px 8px;border-radius:10px;white-space:nowrap}
+.sparkle{position:absolute;pointer-events:none;font-size:18px;animation:sparkA 1s ease-out forwards}
+@keyframes sparkA{0%{transform:scale(0) translateY(0);opacity:1}50%{transform:scale(1.2) translateY(-20px);opacity:1}100%{transform:scale(0) translateY(-40px);opacity:0}}
+
+/* MUSIC BOX */
+#musicbox-screen{background:#fce4ec;align-items:center;justify-content:center;gap:14px;overflow-y:auto;padding:60px 10px 30px}
+.sec-title{font-size:clamp(20px,5vw,28px);color:var(--text);text-align:center;flex-shrink:0}
+.musicbox-visual{position:relative;width:180px;height:180px;display:flex;align-items:center;justify-content:center;flex-shrink:0;cursor:pointer}
+.musicbox-body{width:150px;height:110px;background:#d4a574;border-radius:12px;border:3px solid #b8895a;position:relative;display:flex;align-items:center;justify-content:center;box-shadow:0 6px 20px rgba(0,0,0,.15),inset 0 2px 8px rgba(255,255,255,.2)}
+.musicbox-lid{position:absolute;top:-40px;width:150px;height:45px;background:#c89960;border-radius:12px 12px 0 0;border:3px solid #b8895a;border-bottom:none;transform-origin:bottom center;transition:transform .6s ease;display:flex;align-items:center;justify-content:center;box-shadow:0 -3px 10px rgba(0,0,0,.1)}
+.musicbox-lid.open{transform:rotateX(-70deg) translateY(-5px)}
+.musicbox-dancer{font-size:14px;transition:all .3s ease;display:flex;flex-direction:column;align-items:center}
+.musicbox-dancer.dancing .ballerina-figure{animation:ballerinaSpin 2s linear infinite}
+.ballerina-figure{display:flex;flex-direction:column;align-items:center}
+.bal-head{font-size:20px;line-height:1;margin-bottom:-2px}
+.bal-body{width:4px;height:10px;background:#f5b8c4;border-radius:2px}
+.bal-tutu{width:28px;height:12px;background:#f5b8c4;border-radius:0 0 50% 50%;margin-top:-2px;border:1px solid #f0a0b4;position:relative}
+.bal-tutu::before{content:'';position:absolute;top:-1px;left:2px;right:2px;height:4px;background:#fce4ec;border-radius:0 0 50% 50%}
+.bal-leg{width:3px;height:14px;background:#fddcb5;margin-top:-1px;border-radius:0 0 2px 2px;transform-origin:top center}
+.bal-leg::after{content:'';display:block;width:6px;height:3px;background:#f5b8c4;border-radius:2px;margin-top:0;margin-left:-1.5px}
+@keyframes ballerinaSpin{0%{transform:rotateY(0deg)}100%{transform:rotateY(360deg)}}
+.musicbox-notes{position:absolute;width:100%;height:100%;pointer-events:none}
+.floating-note{position:absolute;font-size:20px;animation:fNote 3s ease-out forwards;pointer-events:none}
+@keyframes fNote{0%{opacity:1;transform:translateY(0) rotate(0) scale(1)}100%{opacity:0;transform:translateY(-80px) rotate(20deg) scale(.5)}}
+.melody-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;padding:0 16px;max-width:400px;width:100%}
+.melody-btn{background:var(--white);border:2.5px solid #d4a574;border-radius:16px;padding:12px 6px;display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer;transition:all .25s ease;box-shadow:0 3px 10px rgba(0,0,0,.05)}
+.melody-btn.active{background:var(--yellow);border-color:#e8c840;transform:scale(1.05)}
+.melody-btn:active{transform:scale(.95)}
+.m-emoji{font-size:26px}.m-label{font-size:11px;color:var(--text);font-weight:bold}
+
+/* SOUNDS */
+#sounds-screen{background:#fce4ec;align-items:center;justify-content:center;gap:16px;padding:60px 10px 30px}
+.orb-box{position:relative;width:160px;height:160px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.orb{width:110px;height:110px;border-radius:50%;background:var(--lavender);display:flex;align-items:center;justify-content:center;font-size:40px;cursor:pointer;transition:all .3s ease;box-shadow:0 5px 30px rgba(201,184,232,.5);position:relative;z-index:2}
+.orb.playing{animation:orbP 1.5s ease-in-out infinite;box-shadow:0 5px 50px rgba(201,184,232,.7)}
+@keyframes orbP{0%,100%{transform:scale(1)}50%{transform:scale(1.08)}}
+.orb-ring{position:absolute;border-radius:50%;border:2px solid var(--lavender);opacity:0;top:50%;left:50%;transform:translate(-50%,-50%)}
+.orb.playing~.orb-ring{animation:ringE 2s ease-out infinite}
+.orb-ring:nth-child(3){animation-delay:.5s!important}.orb-ring:nth-child(4){animation-delay:1s!important}
+@keyframes ringE{0%{width:110px;height:110px;opacity:.6}100%{width:200px;height:200px;opacity:0}}
+.snd-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;padding:0 24px;max-width:340px;width:100%}
+.snd-btn{background:var(--white);border:2px solid var(--lavender);border-radius:16px;padding:12px 6px;display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer;transition:all .25s ease;box-shadow:0 3px 10px rgba(0,0,0,.05)}
+.snd-btn.active{background:var(--lavender);border-color:#a898d8;transform:scale(1.05)}
+.snd-btn:active{transform:scale(.95)}
+.s-emoji{font-size:26px}.s-label{font-size:11px;color:var(--text)}
+.vol{display:flex;align-items:center;gap:10px}.vol input[type="range"]{width:120px;accent-color:var(--lavender)}
+
+/* BUTTERFLY */
+#butterfly-screen{background:#fce4ec;overflow:hidden}
+.bf-area{flex:1;position:relative;overflow:hidden}
+.bf{position:absolute;cursor:pointer;z-index:10;filter:drop-shadow(0 4px 8px rgba(0,0,0,.15))}
+.bf.flying .bf-svg{animation:bfFlap .5s ease-in-out infinite alternate}
+.bf-svg{width:70px;height:65px}
+@keyframes bfFlap{0%{transform:scaleY(1)}100%{transform:scaleY(.82)}}
+.bf-trail{position:absolute;font-size:14px;pointer-events:none;animation:trF 1.5s ease-out forwards}
+@keyframes trF{0%{opacity:.8;transform:scale(1)}100%{opacity:0;transform:scale(.3) translateY(10px)}}
+.nat-item{position:absolute;font-size:clamp(24px,6vw,40px);animation:sway 4s ease-in-out infinite;pointer-events:none}
+@keyframes sway{0%,100%{transform:rotate(-3deg)}50%{transform:rotate(3deg)}}
+
+/* BUBBLES */
+#bubble-screen{background:#fce4ec;overflow:hidden}
+.bub-area{flex:1;position:relative;overflow:hidden}
+.bub{position:absolute;border-radius:50%;cursor:pointer;animation:fUp 6s ease-in forwards;display:flex;align-items:center;justify-content:center;box-shadow:inset -8px -8px 20px rgba(255,255,255,.6),inset 4px 4px 10px rgba(100,150,255,.15);border:1px solid rgba(255,255,255,.5)}
+@keyframes fUp{0%{transform:translateY(0) scale(1);opacity:.9}20%{opacity:1}100%{transform:translateY(-110vh) scale(.8);opacity:0}}
+.bub-pop{position:absolute;pointer-events:none;animation:popA .5s ease-out forwards}
+@keyframes popA{0%{transform:scale(1);opacity:1}50%{transform:scale(1.8);opacity:.6}100%{transform:scale(2.5);opacity:0}}
+
+/* LEARNING */
+#learn-screen{background:#fce4ec;align-items:center;overflow-y:auto;padding:52px 8px 14px;gap:6px}
+.l-tabs{display:flex;gap:4px;flex-wrap:wrap;justify-content:center;padding:0 6px;flex-shrink:0}
+.l-tab{background:var(--white);border:2px solid #a8c8e8;border-radius:16px;padding:5px 10px;cursor:pointer;font-family:'Varela Round',sans-serif;font-size:12px;color:var(--text);transition:all .25s ease}
+.l-tab.active{background:#a8c8e8;color:white;font-weight:bold}
+.l-content{flex:1;width:100%;max-width:440px;display:flex;align-items:center;justify-content:center;gap:8px;min-height:0;padding:0 6px}
+.l-card{flex:1;max-width:280px;min-height:200px;background:var(--white);border-radius:28px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;box-shadow:0 6px 25px rgba(0,0,0,.08);cursor:pointer;transition:all .3s ease;padding:16px}
+.l-card:active{transform:scale(.97)}
+.l-emoji{font-size:clamp(64px,20vw,100px);transition:transform .4s ease;filter:drop-shadow(0 3px 6px rgba(0,0,0,.1))}
+.l-card.bounce .l-emoji{animation:cBounce .5s ease}
+@keyframes cBounce{0%{transform:scale(1)}30%{transform:scale(1.25)}60%{transform:scale(.95)}100%{transform:scale(1)}}
+.l-name{font-size:clamp(26px,7vw,38px);color:var(--text);font-weight:bold}
+.l-extra{font-size:clamp(14px,3.5vw,18px);color:#8b7b9b;text-align:center}
+.l-arrow{width:54px;height:54px;border-radius:50%;background:var(--white);border:3px solid #a8c8e8;font-size:24px;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 3px 12px rgba(0,0,0,.1);transition:all .2s;flex-shrink:0}
+.l-arrow:active{transform:scale(.88);background:#a8c8e8}
+.l-bottom{display:flex;flex-direction:column;align-items:center;gap:6px;flex-shrink:0;padding-bottom:4px}
+.l-counter{font-size:14px;color:#8b7b9b}
+.l-prog{display:flex;gap:5px;justify-content:center;flex-wrap:wrap;flex-shrink:0}
+.p-dot{width:10px;height:10px;border-radius:50%;background:#d0dde8;transition:all .3s ease}
+.p-dot.cur{background:#a8c8e8;transform:scale(1.3)}.p-dot.vis{background:var(--mint)}
+.l-speak-hint{font-size:12px;color:#a8b8c8;animation:pulse 2s ease-in-out infinite}
+
+/* COMMUNICATION BOARD */
+#comm-screen{background:#fce4ec;align-items:center;overflow-y:auto;padding:52px 8px 14px;gap:10px}
+.comm-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;padding:0 12px;max-width:400px;width:100%}
+.comm-btn{background:var(--white);border:3px solid #f5b8c4;border-radius:22px;padding:14px 8px;display:flex;flex-direction:column;align-items:center;gap:6px;cursor:pointer;transition:all .2s ease;box-shadow:0 4px 15px rgba(0,0,0,.06)}
+.comm-btn:active{transform:scale(.93)}
+.comm-btn.pressed{animation:commPop .6s ease forwards;background:#fce4ec}
+@keyframes commPop{0%{transform:scale(.93)}30%{transform:scale(1.08)}60%{transform:scale(.97)}100%{transform:scale(1)}}
+.comm-icon{font-size:40px;filter:drop-shadow(0 2px 4px rgba(0,0,0,.1))}
+.comm-label{font-size:clamp(13px,3.5vw,16px);color:var(--text);font-weight:bold;text-align:center}
+.comm-msg{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%) scale(0);background:var(--white);border-radius:28px;padding:24px 32px;box-shadow:0 10px 40px rgba(0,0,0,.2);z-index:300;display:flex;flex-direction:column;align-items:center;gap:10px;transition:transform .3s ease;border:3px solid #f5b8c4}
+.comm-msg.show{transform:translate(-50%,-50%) scale(1)}
+.comm-msg-emoji{font-size:60px}
+.comm-msg-text{font-size:clamp(18px,5vw,26px);color:var(--text);font-weight:bold;text-align:center}
+.comm-msg-sub{font-size:14px;color:#8b7b9b}
+
+/* NIGHT / FIREFLIES */
+#night-screen{background:linear-gradient(180deg,#0a0a2e 0%,#1a1a4e 40%,#0d2b0d 70%,#0a1f0a 100%);overflow:hidden}
+.night-area{flex:1;position:relative;overflow:hidden}
+.night-moon{position:absolute;top:8%;right:12%;width:60px;height:60px;background:#fce588;border-radius:50%;box-shadow:0 0 40px rgba(252,229,136,.4),0 0 80px rgba(252,229,136,.2);pointer-events:none}
+.night-moon::after{content:'';position:absolute;top:8px;left:10px;width:14px;height:14px;background:rgba(0,0,0,.05);border-radius:50%}
+.night-star{position:absolute;color:white;pointer-events:none;animation:twinkStar 2s ease-in-out infinite}
+@keyframes twinkStar{0%,100%{opacity:.3;transform:scale(.8)}50%{opacity:1;transform:scale(1.2)}}
+.night-tree{position:absolute;bottom:0;pointer-events:none;font-size:clamp(40px,12vw,70px);opacity:.6}
+.firefly{position:absolute;width:8px;height:8px;border-radius:50%;cursor:pointer;transition:none;z-index:10}
+.firefly-inner{width:100%;height:100%;border-radius:50%;background:#88cc33;opacity:.4;box-shadow:0 0 4px #88cc33;transition:all .3s ease}
+.firefly.lit .firefly-inner{background:#ffff66;opacity:1;box-shadow:0 0 20px #ffff66,0 0 40px rgba(255,255,100,.6),0 0 60px rgba(255,255,100,.3);transform:scale(1.8)}
+.ff-burst{position:absolute;pointer-events:none;font-size:14px;animation:ffBurst 1s ease-out forwards}
+@keyframes ffBurst{0%{opacity:1;transform:scale(.5) translateY(0)}100%{opacity:0;transform:scale(1.2) translateY(-30px)}}
+.night-hint{position:absolute;bottom:20px;width:100%;text-align:center;font-size:clamp(14px,3.5vw,18px);color:rgba(170,255,68,.6);animation:pulse 2s ease-in-out infinite;z-index:5}
+
+.floating-deco{position:absolute;pointer-events:none;opacity:.3;animation:fDeco 8s ease-in-out infinite}
+@keyframes fDeco{0%,100%{transform:translateY(0) rotate(0)}25%{transform:translateY(-15px) rotate(5deg)}75%{transform:translateY(10px) rotate(-3deg)}}
+.clear-btn{position:fixed;bottom:16px;right:16px;z-index:200;padding:8px 16px;border-radius:20px;background:var(--white);border:2px solid var(--mint);font-family:'Varela Round',sans-serif;font-size:14px;color:var(--text);cursor:pointer;box-shadow:0 3px 10px rgba(0,0,0,.1)}
+.mute-btn{position:fixed;bottom:16px;left:16px;z-index:200;width:44px;height:44px;border-radius:50%;background:var(--white);border:2px solid var(--lavender);font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 3px 10px rgba(0,0,0,.1);transition:all .2s}
+.mute-btn.muted{background:#f0e0e0;border-color:#e0a0a0;opacity:.7}
+.mute-btn:active{transform:scale(.9)}
+</style>
+</head>
+<body>
+<div class="bsd">בס״ד</div>
+<button class="mute-btn" id="muteBtn" onclick="toggleMute()" title="השתק קול">🔊</button>
+
+<div id="main-screen">
+  <div class="main-title">🌸 הגן הקסום של מעייני 🌸</div>
+  <div class="main-subtitle">מה נעשה היום?</div>
+  <div class="activity-grid">
+    <button class="activity-btn" onclick="openScreen('garden')"><span class="activity-icon">🌷</span><span class="activity-label">גן פרחים</span></button>
+    <button class="activity-btn" onclick="openScreen('musicbox')"><span class="activity-icon">🎵</span><span class="activity-label">תיבת נגינה</span></button>
+    <button class="activity-btn" onclick="openScreen('sounds')"><span class="activity-icon">🌿</span><span class="activity-label">צלילי טבע</span></button>
+    <button class="activity-btn" onclick="openScreen('butterfly')"><span class="activity-icon"><svg width="36" height="36" viewBox="0 0 100 90" style="display:block;margin:0 auto"><g transform="translate(50,45)"><ellipse cx="-22" cy="-12" rx="22" ry="18" fill="#d8a0e8" stroke="#b070c8" stroke-width="1.5"/><ellipse cx="-24" cy="-14" rx="12" ry="10" fill="rgba(255,255,255,0.3)"/><ellipse cx="22" cy="-12" rx="22" ry="18" fill="#f5a0b8" stroke="#d87090" stroke-width="1.5"/><ellipse cx="24" cy="-14" rx="12" ry="10" fill="rgba(255,255,255,0.3)"/><ellipse cx="-16" cy="10" rx="16" ry="13" fill="#e0b8f0" stroke="#b070c8" stroke-width="1.2"/><ellipse cx="16" cy="10" rx="16" ry="13" fill="#f8c0d0" stroke="#d87090" stroke-width="1.2"/><ellipse cx="0" cy="0" rx="3" ry="18" fill="#6b5b7b"/><circle cx="0" cy="-20" r="4" fill="#6b5b7b"/><path d="M-2 -24 Q-10 -38 -14 -36" stroke="#6b5b7b" stroke-width="1.5" fill="none"/><circle cx="-14" cy="-36" r="2.5" fill="#c9b8e8"/><path d="M2 -24 Q10 -38 14 -36" stroke="#6b5b7b" stroke-width="1.5" fill="none"/><circle cx="14" cy="-36" r="2.5" fill="#f5b8c4"/></g></svg></span><span class="activity-label">פרפרים</span></button>
+    <button class="activity-btn" onclick="openScreen('bubble')"><span class="activity-icon">🫧</span><span class="activity-label">בועות</span></button>
+    <button class="activity-btn" onclick="openScreen('learn')"><span class="activity-icon">📚</span><span class="activity-label">בואי נלמד!</span></button>
+    <button class="activity-btn" onclick="openScreen('night')"><span class="activity-icon">🌙</span><span class="activity-label">לילה קסום</span></button>
+    <button class="activity-btn" onclick="openScreen('signs')"><span class="activity-icon">🤟</span><span class="activity-label">שפת סימנים</span></button>
+    <button class="activity-btn" onclick="openScreen('symbols')"><span class="activity-icon">⚠️</span><span class="activity-label">זהירות!</span></button>
+    <button class="activity-btn" style="grid-column:1/-1" onclick="openScreen('comm')"><span class="activity-icon">💬</span><span class="activity-label">מעייני רוצה</span></button>
+  </div>
+  <div class="floating-deco" style="top:8%;left:15%;font-size:28px;animation-delay:-2s">🌿</div>
+  <div class="floating-deco" style="top:6%;right:22%;font-size:22px;animation-delay:-4s">🌻</div>
+  <div class="floating-deco" style="bottom:42%;left:8%;font-size:20px;animation-delay:-1s">🐞</div>
+  <div class="floating-deco" style="bottom:44%;right:10%;font-size:24px;animation-delay:-3s">🍃</div>
+  <div class="floating-deco" style="bottom:28%;left:5%;font-size:22px;animation-delay:-1.5s">🌸</div>
+  <div class="floating-deco" style="bottom:32%;left:25%;font-size:18px;animation-delay:-3.5s">🌷</div>
+  <div class="floating-deco" style="bottom:26%;right:8%;font-size:24px;animation-delay:-0.5s">🌺</div>
+  <div class="floating-deco" style="bottom:30%;right:28%;font-size:16px;animation-delay:-2.5s">🌼</div>
+  <div class="floating-deco" style="bottom:34%;left:45%;font-size:20px;animation-delay:-4.5s">🪻</div>
+  <div class="floating-deco" style="bottom:24%;left:60%;font-size:18px;animation-delay:-1.8s">🌹</div>
+  <div class="floating-deco" style="bottom:36%;left:75%;font-size:16px;animation-delay:-3.2s">🌻</div>
+</div>
+
+<div id="garden-screen" class="screen">
+  <button class="back-btn" onclick="goHome()">🏠</button>
+  <button class="clear-btn" onclick="clearGarden()">🌱 גן חדש</button>
+  <div class="garden-canvas" id="gardenCanvas" onclick="plantFlower(event)">
+    <div class="hint-text" style="color:#7b9b7b">🌱 לחצי כדי לשתול פרחים!</div>
+    <div class="garden-girl" id="gardenGirl">
+      <div class="girl-container">
+        <div class="girl-head-emoji">👧🏻</div>
+        <div class="girl-dress-top" style="position:relative">
+          <div class="girl-arms">
+            <div class="girl-arm l"><div class="girl-hand"></div></div>
+            <div class="girl-arm r"><div class="girl-hand"></div><div class="girl-flower-hand">🌷</div></div>
+          </div>
+        </div>
+        <div class="girl-dress-bot"></div>
+        <div class="girl-legs">
+          <div class="girl-leg l"></div>
+          <div class="girl-leg r"></div>
+        </div>
+        <div class="girl-name">⭐ מעייני ⭐</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="musicbox-screen" class="screen">
+  <button class="back-btn" onclick="goHome()">🏠</button>
+  <div class="sec-title">🎵 תיבת הנגינה 🎵</div>
+  <div class="musicbox-visual" onclick="toggleMusicBox()">
+    <div class="musicbox-body">
+      <div class="musicbox-lid" id="musicboxLid"><span style="font-size:20px;opacity:.6">🌸 ✨ 🌸</span></div>
+      <div class="musicbox-dancer" id="musicboxDancer"><div class="ballerina-figure"><div class="bal-head">👧🏻</div><div class="bal-body"></div><div class="bal-tutu"></div><div class="bal-leg"></div></div></div>
+    </div>
+    <div class="musicbox-notes" id="musicboxNotes"></div>
+  </div>
+  <div class="melody-grid">
+    <button class="melody-btn" onclick="playMelodyChoice('lullaby',this)"><span class="m-emoji">🌙</span><span class="m-label">שיר ערש</span></button>
+    <button class="melody-btn" onclick="playMelodyChoice('butterfly',this)"><span class="m-emoji">🦋</span><span class="m-label">פרפר נחמד</span></button>
+    <button class="melody-btn" onclick="playMelodyChoice('twinkle',this)"><span class="m-emoji">⭐</span><span class="m-label">כוכב קטן</span></button>
+    <button class="melody-btn" onclick="playMelodyChoice('garden',this)"><span class="m-emoji">🌺</span><span class="m-label">גן ורדים</span></button>
+    <button class="melody-btn" onclick="playMelodyChoice('rain',this)"><span class="m-emoji">🌧️</span><span class="m-label">טיפות גשם</span></button>
+    <button class="melody-btn" onclick="playMelodyChoice('happy',this)"><span class="m-emoji">🌈</span><span class="m-label">שמחה</span></button>
+    <button class="melody-btn" onclick="playMelodyChoice('mozart1',this)"><span class="m-emoji">🎹</span><span class="m-label">סונטה קטנה</span></button>
+    <button class="melody-btn" onclick="playMelodyChoice('mozart2',this)"><span class="m-emoji">🎻</span><span class="m-label">מנגינת לילה</span></button>
+    <button class="melody-btn" onclick="playMelodyChoice('mozart3',this)"><span class="m-emoji">🎶</span><span class="m-label">ריקוד עדין</span></button>
+  </div>
+  <div class="vol"><span>🔈</span><input type="range" min="0" max="100" value="50" oninput="setVolume(this.value)"><span>🔊</span></div>
+</div>
+
+<div id="sounds-screen" class="screen">
+  <button class="back-btn" onclick="goHome()">🏠</button>
+  <div class="sec-title">🌿 צלילי הטבע 🌿</div>
+  <div class="orb-box">
+    <div class="orb" id="soundOrb" onclick="toggleAmbient()">🎧</div>
+    <div class="orb-ring"></div><div class="orb-ring"></div>
+  </div>
+  <div class="snd-grid">
+    <button class="snd-btn" onclick="playNatureSound(this,'rain')"><span class="s-emoji">🌧️</span><span class="s-label">גשם</span></button>
+    <button class="snd-btn" onclick="playNatureSound(this,'birds')"><span class="s-emoji">🐦</span><span class="s-label">ציפורים</span></button>
+    <button class="snd-btn" onclick="playNatureSound(this,'ocean')"><span class="s-emoji">🌊</span><span class="s-label">ים</span></button>
+    <button class="snd-btn" onclick="playNatureSound(this,'wind')"><span class="s-emoji">🍃</span><span class="s-label">רוח</span></button>
+    <button class="snd-btn" onclick="playNatureSound(this,'night')"><span class="s-emoji">🌙</span><span class="s-label">לילה</span></button>
+    <button class="snd-btn" onclick="playNatureSound(this,'stream')"><span class="s-emoji">💧</span><span class="s-label">נחל</span></button>
+  </div>
+  <div class="vol"><span>🔈</span><input type="range" min="0" max="100" value="50" oninput="setVolume(this.value)"><span>🔊</span></div>
+</div>
+
+<div id="butterfly-screen" class="screen">
+  <button class="back-btn" onclick="goHome()">🏠</button>
+  <div class="bf-area" id="butterflyArea"><div class="hint-text" style="color:#7b9b8b">🦋 לחצי על הפרפר!</div></div>
+</div>
+
+<div id="bubble-screen" class="screen">
+  <button class="back-btn" onclick="goHome()">🏠</button>
+  <div class="bub-area" id="bubbleArea" onclick="createBubble(event)"><div class="hint-text" style="color:#6b8bab">🫧 לחצי ליצור בועות!</div></div>
+</div>
+
+<div id="comm-screen" class="screen" style="background:#fce4ec;align-items:center;overflow-y:auto;padding:52px 8px 14px;gap:10px">
+  <button class="back-btn" onclick="goHome()">🏠</button>
+  <div class="sec-title">💬 מעייני רוצה... 💬</div>
+  <div class="comm-grid">
+    <button class="comm-btn" onclick="commTap(this,'🤗','מַעְיָנִי רוֹצָה חִיבּוּק','חיבוק')"><span class="comm-icon">🤗</span><span class="comm-label">חיבוק</span></button>
+    <button class="comm-btn" onclick="commTap(this,'😘','מַעְיָנִי רוֹצָה נְשִׁיקָה','נשיקה')"><span class="comm-icon">😘</span><span class="comm-label">נשיקה</span></button>
+    <button class="comm-btn" onclick="commTap(this,'🍽️','מַעְיָנִי רוֹצָה לֶאֱכוֹל','לאכול')"><span class="comm-icon">🍽️</span><span class="comm-label">לאכול</span></button>
+    <button class="comm-btn" onclick="commTap(this,'💧','מַעְיָנִי רוֹצָה מַיִם','מים')"><span class="comm-icon">💧</span><span class="comm-label">מים</span></button>
+    <button class="comm-btn" onclick="commTap(this,'🎮','מַעְיָנִי רוֹצָה לְשַׂחֵק','לשחק')"><span class="comm-icon">🎮</span><span class="comm-label">לשחק</span></button>
+    <button class="comm-btn" onclick="commTap(this,'😴','מַעְיָנִי רוֹצָה לִישׁוֹן','לישון')"><span class="comm-icon">😴</span><span class="comm-label">לישון</span></button>
+    <button class="comm-btn" onclick="commTap(this,'🌳','מַעְיָנִי רוֹצָה לְטַיֵּל','לטייל')"><span class="comm-icon">🌳</span><span class="comm-label">לטייל</span></button>
+    <button class="comm-btn" onclick="commTap(this,'🚽','מַעְיָנִי רוֹצָה לַשֵּׁרוּתִים','לשירותים')"><span class="comm-icon">🚽</span><span class="comm-label">שירותים</span></button>
+  </div>
+</div>
+<div class="comm-msg" id="commMsg">
+  <div class="comm-msg-emoji" id="commMsgEmoji">🤗</div>
+  <div class="comm-msg-text" id="commMsgText">מעייני רוצה חיבוק</div>
+  <div class="comm-msg-sub">לחצי שוב או המתיני...</div>
+</div>
+
+<div id="night-screen" class="screen">
+  <button class="back-btn" onclick="goHome()">🏠</button>
+  <div class="night-area" id="nightArea">
+    <div class="night-moon"></div>
+    <div class="night-hint">✨ לחצי על הגחליליות!</div>
+  </div>
+</div>
+
+<div id="signs-screen" class="screen" style="background:#fce4ec;align-items:center;overflow-y:auto;padding:52px 8px 14px;gap:8px">
+  <button class="back-btn" onclick="goHome()">🏠</button>
+  <div class="sec-title">🤟 שפת הסימנים 🤟</div>
+  <div class="l-content">
+    <button class="l-arrow" onclick="signsNav(1)">➡️</button>
+    <div class="l-card" id="signsCard" onclick="onSignsTap()">
+      <div class="l-emoji" id="signsEmoji">👋</div>
+      <div class="l-name" id="signsName">שלום</div>
+      <div class="l-extra" id="signsExtra">מנופפים ביד!</div>
+      <div class="l-speak-hint">🔊 לחצי לשמוע!</div>
+    </div>
+    <button class="l-arrow" onclick="signsNav(-1)">⬅️</button>
+  </div>
+  <div class="l-bottom">
+    <div class="l-prog" id="signsProg"></div>
+    <div class="l-counter" id="signsCounter">1 / 10</div>
+  </div>
+</div>
+
+<div id="symbols-screen" class="screen" style="background:#fce4ec;align-items:center;overflow-y:auto;padding:52px 8px 14px;gap:8px">
+  <button class="back-btn" onclick="goHome()">🏠</button>
+  <div class="sec-title">⚠️ זהירות! ⚠️</div>
+  <div class="l-content">
+    <button class="l-arrow" onclick="symbolsNav(1)">➡️</button>
+    <div class="l-card" id="symbolsCard" onclick="onSymbolsTap()">
+      <div class="l-emoji" id="symbolsEmoji">🔥</div>
+      <div class="l-name" id="symbolsName">חם</div>
+      <div class="l-extra" id="symbolsExtra">לא נוגעים! כואב!</div>
+      <div class="l-speak-hint">🔊 לחצי לשמוע!</div>
+    </div>
+    <button class="l-arrow" onclick="symbolsNav(-1)">⬅️</button>
+  </div>
+  <div class="l-bottom">
+    <div class="l-prog" id="symbolsProg"></div>
+    <div class="l-counter" id="symbolsCounter">1 / 10</div>
+  </div>
+</div>
+
+<div id="learn-screen" class="screen">
+  <button class="back-btn" onclick="goHome()">🏠</button>
+  <div class="sec-title">📚 בואי נלמד! 📚</div>
+  <div class="l-tabs">
+    <button class="l-tab active" onclick="switchLearnTab('animals',this)">🐾 חיות</button>
+    <button class="l-tab" onclick="switchLearnTab('colors',this)">🎨 צבעים</button>
+    <button class="l-tab" onclick="switchLearnTab('numbers',this)">🔢 מספרים</button>
+    <button class="l-tab" onclick="switchLearnTab('shapes',this)">🔷 צורות</button>
+    <button class="l-tab" onclick="switchLearnTab('fruits',this)">🍎 פירות</button>
+  </div>
+  <div class="l-content" id="learnContent">
+    <button class="l-arrow" onclick="learnPrev()">➡️</button>
+    <div class="l-card" id="learnCard" onclick="onLearnCardTap()">
+      <div class="l-emoji" id="learnEmoji">🐱</div>
+      <div class="l-name" id="learnName">חתול</div>
+      <div class="l-extra" id="learnExtra">אומר: מיאו! 🐾</div>
+      <div class="l-speak-hint">🔊 לחצי לשמוע!</div>
+    </div>
+    <button class="l-arrow" onclick="learnNext()">⬅️</button>
+  </div>
+  <div class="l-bottom">
+    <div class="l-prog" id="learnProgress"></div>
+    <div class="l-counter" id="learnCounter">1 / 10</div>
+  </div>
+</div>
+
+<script>
+// === AUDIO ===
+var audioCtx=null,masterGain=null,activeSounds={},voiceMuted=false;
+function initAudio(){if(audioCtx)return;audioCtx=new(window.AudioContext||window.webkitAudioContext)();masterGain=audioCtx.createGain();masterGain.gain.value=0.3;masterGain.connect(audioCtx.destination)}
+function setVolume(v){if(masterGain)masterGain.gain.value=v/100*0.6}
+function toggleMute(){voiceMuted=!voiceMuted;var btn=document.getElementById('muteBtn');if(voiceMuted){btn.textContent='🔇';btn.classList.add('muted');if('speechSynthesis' in window)speechSynthesis.cancel()}else{btn.textContent='🔊';btn.classList.remove('muted')}}
+function playNote(freq,dur,type,vol){
+  if(!audioCtx||freq===0)return;var t=audioCtx.currentTime;
+  var o=audioCtx.createOscillator(),g=audioCtx.createGain();
+  o.type=type||'sine';o.frequency.value=freq;
+  g.gain.setValueAtTime(vol||0.15,t);g.gain.exponentialRampToValueAtTime(0.001,t+dur);
+  o.connect(g);g.connect(masterGain);o.start();o.stop(t+dur);
+}
+function playMusicBoxNote(freq,dur){
+  if(!audioCtx||freq===0)return;var t=audioCtx.currentTime;
+  var o1=audioCtx.createOscillator(),o2=audioCtx.createOscillator(),o3=audioCtx.createOscillator(),g=audioCtx.createGain(),hg=audioCtx.createGain();
+  o1.type='sine';o1.frequency.value=freq;
+  o2.type='sine';o2.frequency.value=freq*3;
+  o3.type='sine';o3.frequency.value=freq*5;
+  hg.gain.value=0.04;g.gain.setValueAtTime(0.18,t);g.gain.setValueAtTime(0.15,t+0.05);g.gain.exponentialRampToValueAtTime(0.001,t+dur+0.3);
+  o1.connect(g);o2.connect(hg);o3.connect(hg);hg.connect(g);g.connect(masterGain);
+  o1.start();o2.start();o3.start();o1.stop(t+dur+0.4);o2.stop(t+dur+0.4);o3.stop(t+dur+0.4);
+}
+
+// === NAV ===
+var currentScreen=null,bubbleInterval=null,butterflyAnimFrame=null;
+function openScreen(n){initAudio();document.getElementById('main-screen').classList.add('hidden');document.getElementById(n+'-screen').classList.add('active');currentScreen=n;if(n==='butterfly')initButterfly();if(n==='bubble')startBubbleAuto();if(n==='learn')initLearn();playNote(523,0.15);setTimeout(function(){playNote(784,0.3)},100)}
+function goHome(){stopAllSounds();document.querySelectorAll('.screen').forEach(function(s){s.classList.remove('active')});document.getElementById('main-screen').classList.remove('hidden');currentScreen=null;if(bubbleInterval){clearInterval(bubbleInterval);bubbleInterval=null}if(butterflyAnimFrame){cancelAnimationFrame(butterflyAnimFrame);butterflyAnimFrame=null}stopMusicBox()}
+
+// === 1. GARDEN ===
+var flowerE=['🌸','🌺','🌻','🌷','🌹','🌼','💐','🪻','🌿','🍀','🌱','🪷'];
+var sparkE=['✨','⭐','💫','🌟','💖'];
+function plantFlower(e){
+  initAudio();var c=document.getElementById('gardenCanvas'),r=c.getBoundingClientRect();
+  var x=e.clientX-r.left,y=e.clientY-r.top;if(y<r.height*0.35)return;
+  var f=document.createElement('div');f.className='flower';f.style.left=(x-25)+'px';f.style.top=(y-50)+'px';
+  var em=flowerE[Math.floor(Math.random()*flowerE.length)];
+  f.innerHTML='<div class="flower-head">'+em+'</div><div class="flower-stem"></div>';
+  f.onclick=function(ev){ev.stopPropagation();sparkle(ev.clientX-r.left,ev.clientY-r.top,c);playNote(392+Math.random()*400,0.8,'sine',0.15);this.querySelector('.flower-head').style.transform='scale(1.4) rotate(15deg)';var self=this;setTimeout(function(){self.querySelector('.flower-head').style.transform=''},400)};
+  c.appendChild(f);playNote([262,330,392,523,659][Math.floor(Math.random()*5)],0.6,'triangle',0.2);
+}
+function sparkle(x,y,p){for(var i=0;i<3;i++){var s=document.createElement('div');s.className='sparkle';s.textContent=sparkE[Math.floor(Math.random()*sparkE.length)];s.style.left=(x+(Math.random()-.5)*40)+'px';s.style.top=(y+(Math.random()-.5)*40)+'px';p.appendChild(s);setTimeout(function(el){el.remove()},1000,s)}}
+function clearGarden(){document.getElementById('gardenCanvas').querySelectorAll('.flower,.sparkle').forEach(function(el){el.remove()})}
+
+// GARDEN GIRL WALKING
+var girlX=50,girlTarget=200,girlDir=1,girlAnim=null;
+function startGirlWalk(){
+  var girl=document.getElementById('gardenGirl');
+  if(!girl)return;
+  var canvas=document.getElementById('gardenCanvas');
+  var cw=canvas.getBoundingClientRect().width;
+  girlX=50;girlTarget=cw-80;girlDir=1;
+  girl.style.left=girlX+'px';
+  girl.style.transform='scaleX('+girlDir+')';
+  function walkStep(){
+    if(currentScreen!=='garden'){girlAnim=null;return}
+    girlX+=girlDir*0.7;
+    if(girlX>=cw-80){girlDir=-1;girlTarget=30;girl.style.transform='scaleX(-1)'}
+    else if(girlX<=30){girlDir=1;girlTarget=cw-80;girl.style.transform='scaleX(1)'}
+    // gentle sine wave for natural movement
+    var yOff=Math.sin(girlX*0.03)*5;
+    girl.style.left=girlX+'px';
+    girl.style.bottom=(8+yOff)+'%';
+    girlAnim=requestAnimationFrame(walkStep);
+  }
+  walkStep();
+}
+// Start walking when garden opens
+var origOpenScreen=openScreen;
+openScreen=function(n){origOpenScreen(n);if(n==='garden')startGirlWalk()};
+var origGoHome=goHome;
+goHome=function(){if(girlAnim){cancelAnimationFrame(girlAnim);girlAnim=null}origGoHome()}
+
+// === 2. MUSIC BOX ===
+var musicBoxPlaying=false,melodyTO=null,curMelName=null;
+var melodies={
+  lullaby:{notes:[{f:523,d:.5},{f:494,d:.5},{f:440,d:.5},{f:392,d:.5},{f:349,d:.5},{f:330,d:.5},{f:349,d:.5},{f:392,d:1},{f:440,d:.5},{f:494,d:.5},{f:523,d:.5},{f:494,d:.5},{f:440,d:.5},{f:392,d:.5},{f:440,d:.5},{f:494,d:1},{f:523,d:.5},{f:587,d:.5},{f:523,d:.5},{f:494,d:.5},{f:440,d:.5},{f:392,d:.5},{f:349,d:.5},{f:330,d:1}],t:.42},
+  butterfly:{notes:[{f:392,d:.4},{f:440,d:.4},{f:494,d:.6},{f:523,d:.4},{f:587,d:.6},{f:523,d:.4},{f:494,d:.4},{f:440,d:.8},{f:392,d:.4},{f:349,d:.4},{f:330,d:.6},{f:349,d:.4},{f:392,d:.6},{f:440,d:.4},{f:494,d:.4},{f:523,d:.8},{f:587,d:.4},{f:659,d:.6},{f:587,d:.4},{f:523,d:.6},{f:494,d:.4},{f:440,d:.4},{f:392,d:.8}],t:.38},
+  twinkle:{notes:[{f:262,d:.5},{f:262,d:.5},{f:392,d:.5},{f:392,d:.5},{f:440,d:.5},{f:440,d:.5},{f:392,d:1},{f:349,d:.5},{f:349,d:.5},{f:330,d:.5},{f:330,d:.5},{f:294,d:.5},{f:294,d:.5},{f:262,d:1},{f:392,d:.5},{f:392,d:.5},{f:349,d:.5},{f:349,d:.5},{f:330,d:.5},{f:330,d:.5},{f:294,d:1},{f:392,d:.5},{f:392,d:.5},{f:349,d:.5},{f:349,d:.5},{f:330,d:.5},{f:330,d:.5},{f:294,d:1},{f:262,d:.5},{f:262,d:.5},{f:392,d:.5},{f:392,d:.5},{f:440,d:.5},{f:440,d:.5},{f:392,d:1},{f:349,d:.5},{f:349,d:.5},{f:330,d:.5},{f:330,d:.5},{f:294,d:.5},{f:294,d:.5},{f:262,d:1}],t:.35},
+  garden:{notes:[{f:330,d:.6},{f:392,d:.3},{f:440,d:.3},{f:523,d:.6},{f:494,d:.3},{f:440,d:.3},{f:392,d:.6},{f:349,d:.3},{f:330,d:.3},{f:294,d:.9},{f:330,d:.6},{f:392,d:.3},{f:440,d:.3},{f:523,d:.6},{f:587,d:.3},{f:523,d:.3},{f:494,d:.6},{f:440,d:.3},{f:392,d:.3},{f:440,d:.9},{f:523,d:.6},{f:587,d:.3},{f:659,d:.3},{f:587,d:.6},{f:523,d:.3},{f:494,d:.3},{f:440,d:.6},{f:392,d:.3},{f:349,d:.3},{f:330,d:.9}],t:.32},
+  rain:{notes:[{f:784,d:.3},{f:659,d:.3},{f:587,d:.5},{f:0,d:.3},{f:784,d:.3},{f:698,d:.3},{f:659,d:.5},{f:0,d:.3},{f:587,d:.3},{f:523,d:.3},{f:494,d:.5},{f:0,d:.3},{f:659,d:.3},{f:587,d:.3},{f:523,d:.5},{f:0,d:.5},{f:784,d:.3},{f:698,d:.3},{f:659,d:.3},{f:587,d:.3},{f:523,d:.5},{f:494,d:.3},{f:440,d:.3},{f:392,d:.8}],t:.36},
+  happy:{notes:[{f:262,d:.3},{f:330,d:.3},{f:392,d:.3},{f:523,d:.5},{f:494,d:.3},{f:523,d:.3},{f:587,d:.5},{f:523,d:.3},{f:494,d:.3},{f:440,d:.3},{f:392,d:.5},{f:440,d:.3},{f:494,d:.3},{f:523,d:.8},{f:587,d:.3},{f:659,d:.3},{f:587,d:.3},{f:523,d:.5},{f:494,d:.3},{f:440,d:.3},{f:392,d:.5},{f:330,d:.3},{f:349,d:.3},{f:392,d:.3},{f:440,d:.3},{f:523,d:1}],t:.3},
+  mozart1:{notes:[{f:523,d:.4},{f:587,d:.2},{f:523,d:.2},{f:494,d:.2},{f:523,d:.4},{f:659,d:.6},{f:0,d:.2},{f:659,d:.4},{f:698,d:.2},{f:659,d:.2},{f:587,d:.2},{f:659,d:.4},{f:784,d:.6},{f:0,d:.2},{f:784,d:.3},{f:698,d:.3},{f:659,d:.3},{f:587,d:.3},{f:523,d:.3},{f:587,d:.3},{f:494,d:.3},{f:523,d:.8},{f:0,d:.3},{f:392,d:.3},{f:440,d:.3},{f:494,d:.3},{f:523,d:.4},{f:587,d:.4},{f:659,d:.4},{f:523,d:.8},{f:494,d:.3},{f:440,d:.3},{f:392,d:.3},{f:440,d:.3},{f:494,d:.6},{f:523,d:.8}],t:.32},
+  mozart2:{notes:[{f:392,d:.3},{f:0,d:.1},{f:392,d:.3},{f:0,d:.1},{f:392,d:.3},{f:494,d:.6},{f:0,d:.2},{f:440,d:.3},{f:0,d:.1},{f:440,d:.3},{f:0,d:.1},{f:440,d:.3},{f:523,d:.6},{f:0,d:.2},{f:392,d:.3},{f:494,d:.3},{f:523,d:.3},{f:587,d:.5},{f:523,d:.3},{f:494,d:.3},{f:440,d:.3},{f:392,d:.6},{f:0,d:.3},{f:587,d:.3},{f:523,d:.3},{f:494,d:.3},{f:440,d:.3},{f:494,d:.3},{f:523,d:.3},{f:587,d:.6},{f:0,d:.2},{f:659,d:.4},{f:587,d:.3},{f:523,d:.3},{f:494,d:.3},{f:440,d:.3},{f:392,d:.8}],t:.28},
+  mozart3:{notes:[{f:523,d:.5},{f:494,d:.25},{f:523,d:.25},{f:587,d:.5},{f:523,d:.5},{f:440,d:.5},{f:494,d:.25},{f:523,d:.25},{f:494,d:.5},{f:392,d:.5},{f:440,d:.5},{f:494,d:.25},{f:440,d:.25},{f:392,d:.5},{f:349,d:.5},{f:330,d:.5},{f:349,d:.25},{f:392,d:.25},{f:440,d:.5},{f:392,d:.5},{f:0,d:.3},{f:523,d:.5},{f:587,d:.25},{f:659,d:.25},{f:587,d:.5},{f:523,d:.5},{f:494,d:.5},{f:523,d:.25},{f:587,d:.25},{f:523,d:.5},{f:440,d:.5},{f:494,d:.5},{f:523,d:.25},{f:494,d:.25},{f:440,d:.5},{f:392,d:.5},{f:349,d:.3},{f:392,d:.3},{f:440,d:.3},{f:494,d:.3},{f:523,d:.8}],t:.34}
+};
+function toggleMusicBox(){initAudio();if(musicBoxPlaying){stopMusicBox()}else{startMusicBox(curMelName||'lullaby');if(!curMelName)document.querySelector('.melody-btn').classList.add('active')}}
+function playMelodyChoice(n,btn){initAudio();document.querySelectorAll('.melody-btn').forEach(function(b){b.classList.remove('active')});btn.classList.add('active');stopMusicBox();setTimeout(function(){startMusicBox(n)},100)}
+function startMusicBox(n){
+  curMelName=n;musicBoxPlaying=true;
+  document.getElementById('musicboxLid').classList.add('open');
+  document.getElementById('musicboxDancer').classList.add('dancing');
+  var mel=melodies[n],idx=0;
+  function next(){
+    if(!musicBoxPlaying)return;
+    var nd=mel.notes[idx%mel.notes.length];
+    if(nd.f>0){playMusicBoxNote(nd.f,nd.d*mel.t);spawnNote()}
+    idx++;if(idx>=mel.notes.length*3)idx=0;
+    melodyTO=setTimeout(next,nd.d*mel.t*1000);
+  }
+  next();
+}
+function stopMusicBox(){musicBoxPlaying=false;if(melodyTO){clearTimeout(melodyTO);melodyTO=null}var l=document.getElementById('musicboxLid'),d=document.getElementById('musicboxDancer');if(l)l.classList.remove('open');if(d)d.classList.remove('dancing')}
+function spawnNote(){var c=document.getElementById('musicboxNotes');if(!c)return;var syms=['♪','♫','♬','🎵','🎶','✨'];var n=document.createElement('div');n.className='floating-note';n.textContent=syms[Math.floor(Math.random()*syms.length)];n.style.left=(30+Math.random()*120)+'px';n.style.top=(40+Math.random()*60)+'px';n.style.color=['#f5b8c4','#c9b8e8','#fce588','#b5e8d5'][Math.floor(Math.random()*4)];c.appendChild(n);setTimeout(function(){n.remove()},3000)}
+
+// === 3. SOUNDS ===
+var ambientOn=false;
+function toggleAmbient(){var o=document.getElementById('soundOrb');if(ambientOn){ambientOn=false;o.classList.remove('playing');Object.keys(activeSounds).forEach(function(t){activeSounds[t].forEach(function(nd){try{nd.stop()}catch(e){}})});activeSounds={};document.querySelectorAll('.snd-btn.active').forEach(function(b){b.classList.remove('active')})}else{ambientOn=true;o.classList.add('playing')}}
+function playNatureSound(btn,type){
+  initAudio();if(!ambientOn){ambientOn=true;document.getElementById('soundOrb').classList.add('playing')}
+  if(btn.classList.contains('active')){btn.classList.remove('active');if(activeSounds[type]){activeSounds[type].forEach(function(nd){try{nd.stop()}catch(e){}});delete activeSounds[type]}if(!Object.keys(activeSounds).length){ambientOn=false;document.getElementById('soundOrb').classList.remove('playing')}return}
+  btn.classList.add('active');var nodes=[];
+  if(type==='rain'){var buf=audioCtx.createBuffer(1,audioCtx.sampleRate*2,audioCtx.sampleRate),d=buf.getChannelData(0);for(var i=0;i<d.length;i++)d[i]=Math.random()*2-1;var s=audioCtx.createBufferSource();s.buffer=buf;s.loop=true;var f=audioCtx.createBiquadFilter();f.type='lowpass';f.frequency.value=1500;var g=audioCtx.createGain();g.gain.value=0.08;s.connect(f);f.connect(g);g.connect(masterGain);s.start();nodes.push(s)}
+  else if(type==='birds'){nodes.push({stop:function(){}});activeSounds[type]=nodes;(function chirp(){if(!activeSounds.birds)return;var t=audioCtx.currentTime;var bf=2200+Math.random()*800;var o=audioCtx.createOscillator(),g=audioCtx.createGain();o.type='sine';o.frequency.setValueAtTime(bf,t);o.frequency.linearRampToValueAtTime(bf*1.3,t+.05);o.frequency.linearRampToValueAtTime(bf*0.9,t+.1);o.frequency.linearRampToValueAtTime(bf*1.2,t+.15);o.frequency.linearRampToValueAtTime(bf*0.7,t+.22);g.gain.setValueAtTime(.25,t);g.gain.setValueAtTime(.25,t+.15);g.gain.exponentialRampToValueAtTime(.001,t+.28);o.connect(g);g.connect(masterGain);o.start(t);o.stop(t+.3);setTimeout(function(){if(!activeSounds.birds)return;var t2=audioCtx.currentTime;var bf2=2500+Math.random()*600;var o2=audioCtx.createOscillator(),g2=audioCtx.createGain();o2.type='sine';o2.frequency.setValueAtTime(bf2,t2);o2.frequency.linearRampToValueAtTime(bf2*1.15,t2+.04);o2.frequency.linearRampToValueAtTime(bf2*0.85,t2+.08);g2.gain.setValueAtTime(.2,t2);g2.gain.exponentialRampToValueAtTime(.001,t2+.12);o2.connect(g2);g2.connect(masterGain);o2.start(t2);o2.stop(t2+.15)},120);setTimeout(chirp,700+Math.random()*1500)})();return}
+  else if(type==='ocean'){var buf=audioCtx.createBuffer(1,audioCtx.sampleRate*4,audioCtx.sampleRate),d=buf.getChannelData(0);for(var i=0;i<d.length;i++)d[i]=(Math.random()*2-1)*(.3+.7*Math.sin(i/audioCtx.sampleRate*.3));var s=audioCtx.createBufferSource();s.buffer=buf;s.loop=true;var f=audioCtx.createBiquadFilter();f.type='lowpass';f.frequency.value=800;var g=audioCtx.createGain();g.gain.value=0.1;s.connect(f);f.connect(g);g.connect(masterGain);s.start();nodes.push(s)}
+  else if(type==='wind'){var buf=audioCtx.createBuffer(1,audioCtx.sampleRate*3,audioCtx.sampleRate),d=buf.getChannelData(0);for(var i=0;i<d.length;i++)d[i]=(Math.random()*2-1)*(.2+.3*Math.sin(i/audioCtx.sampleRate*.5));var s=audioCtx.createBufferSource();s.buffer=buf;s.loop=true;var f=audioCtx.createBiquadFilter();f.type='bandpass';f.frequency.value=500;f.Q.value=.5;var g=audioCtx.createGain();g.gain.value=0.08;s.connect(f);f.connect(g);g.connect(masterGain);s.start();nodes.push(s)}
+  else if(type==='night'){nodes.push({stop:function(){}});activeSounds[type]=nodes;(function owl(){if(!activeSounds.night)return;var t=audioCtx.currentTime;var o1=audioCtx.createOscillator(),o2=audioCtx.createOscillator(),g=audioCtx.createGain();o1.type='sine';o2.type='sine';o1.frequency.setValueAtTime(380,t);o1.frequency.linearRampToValueAtTime(320,t+.4);o2.frequency.setValueAtTime(385,t);o2.frequency.linearRampToValueAtTime(322,t+.4);g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(.22,t+.05);g.gain.setValueAtTime(.22,t+.3);g.gain.exponentialRampToValueAtTime(.001,t+.6);o1.connect(g);o2.connect(g);g.connect(masterGain);o1.start(t);o2.start(t);o1.stop(t+.7);o2.stop(t+.7);setTimeout(function(){if(!activeSounds.night)return;var t2=audioCtx.currentTime;var o3=audioCtx.createOscillator(),g2=audioCtx.createGain();o3.type='sine';o3.frequency.setValueAtTime(300,t2);o3.frequency.linearRampToValueAtTime(260,t2+.5);g2.gain.setValueAtTime(0,t2);g2.gain.linearRampToValueAtTime(.18,t2+.05);g2.gain.setValueAtTime(.18,t2+.35);g2.gain.exponentialRampToValueAtTime(.001,t2+.55);o3.connect(g2);g2.connect(masterGain);o3.start(t2);o3.stop(t2+.6)},700);setTimeout(owl,2500+Math.random()*3000)})();return}
+  else if(type==='stream'){var sbuf=audioCtx.createBuffer(1,audioCtx.sampleRate*3,audioCtx.sampleRate),sd=sbuf.getChannelData(0);for(var i=0;i<sd.length;i++){sd[i]=(Math.random()*2-1)*(.15+.25*Math.sin(i/audioCtx.sampleRate*2.5))*(.8+.2*Math.sin(i/audioCtx.sampleRate*7))}var ss=audioCtx.createBufferSource();ss.buffer=sbuf;ss.loop=true;var sf=audioCtx.createBiquadFilter();sf.type='bandpass';sf.frequency.value=2000;sf.Q.value=0.8;var sf2=audioCtx.createBiquadFilter();sf2.type='highpass';sf2.frequency.value=400;var sg=audioCtx.createGain();sg.gain.value=0.15;ss.connect(sf);sf.connect(sf2);sf2.connect(sg);sg.connect(masterGain);ss.start();nodes.push(ss);(function drip(){if(!activeSounds.stream)return;var t=audioCtx.currentTime;var o=audioCtx.createOscillator(),g=audioCtx.createGain();o.type='sine';o.frequency.setValueAtTime(800+Math.random()*600,t);o.frequency.exponentialRampToValueAtTime(400+Math.random()*200,t+.15);g.gain.setValueAtTime(.08,t);g.gain.exponentialRampToValueAtTime(.001,t+.2);o.connect(g);g.connect(masterGain);o.start();o.stop(t+.25);setTimeout(drip,400+Math.random()*800)})()}
+  activeSounds[type]=nodes;
+}
+function stopAllSounds(){stopMusicBox();ambientOn=false;var o=document.getElementById('soundOrb');if(o)o.classList.remove('playing');Object.keys(activeSounds).forEach(function(t){activeSounds[t].forEach(function(nd){try{nd.stop()}catch(e){}})});activeSounds={};document.querySelectorAll('.snd-btn.active,.melody-btn.active').forEach(function(b){b.classList.remove('active')})}
+
+// === 4. BUTTERFLY ===
+var bfX,bfY,tgX,tgY;
+function initButterfly(){
+  var a=document.getElementById('butterflyArea');a.innerHTML='<div class="hint-text" style="color:#c080d8">💜 לחצי על הפרפר!</div>';
+  var items=['🌿','🌻','🌸','🍃','🌺','🪻','🌷'];
+  for(var i=0;i<8;i++){var it=document.createElement('div');it.className='nat-item';it.textContent=items[Math.floor(Math.random()*items.length)];it.style.left=(10+Math.random()*80)+'%';it.style.top=(20+Math.random()*60)+'%';it.style.animationDelay=(-Math.random()*4)+'s';a.appendChild(it)}
+  var bf=document.createElement('div');bf.className='bf flying';bf.id='theButterfly';
+  bf.innerHTML='<svg class="bf-svg" viewBox="0 0 100 90" xmlns="http://www.w3.org/2000/svg">' +
+    '<g transform="translate(50,45)">' +
+    '<!-- left upper wing --><ellipse cx="-22" cy="-12" rx="22" ry="18" fill="#d8a0e8" stroke="#b070c8" stroke-width="1.5"/>' +
+    '<ellipse cx="-24" cy="-14" rx="12" ry="10" fill="rgba(255,255,255,0.3)"/>' +
+    '<ellipse cx="-20" cy="-8" rx="6" ry="5" fill="rgba(180,120,220,0.4)"/>' +
+    '<!-- right upper wing --><ellipse cx="22" cy="-12" rx="22" ry="18" fill="#f5a0b8" stroke="#d87090" stroke-width="1.5"/>' +
+    '<ellipse cx="24" cy="-14" rx="12" ry="10" fill="rgba(255,255,255,0.3)"/>' +
+    '<ellipse cx="20" cy="-8" rx="6" ry="5" fill="rgba(220,120,160,0.4)"/>' +
+    '<!-- left lower wing --><ellipse cx="-16" cy="10" rx="16" ry="13" fill="#e0b8f0" stroke="#b070c8" stroke-width="1.2"/>' +
+    '<ellipse cx="-17" cy="9" rx="8" ry="6" fill="rgba(255,255,255,0.25)"/>' +
+    '<!-- right lower wing --><ellipse cx="16" cy="10" rx="16" ry="13" fill="#f8c0d0" stroke="#d87090" stroke-width="1.2"/>' +
+    '<ellipse cx="17" cy="9" rx="8" ry="6" fill="rgba(255,255,255,0.25)"/>' +
+    '<!-- body --><ellipse cx="0" cy="0" rx="3" ry="18" fill="#6b5b7b"/>' +
+    '<!-- head --><circle cx="0" cy="-20" r="4" fill="#6b5b7b"/>' +
+    '<!-- eyes --><circle cx="-2" cy="-21" r="1" fill="white"/><circle cx="2" cy="-21" r="1" fill="white"/>' +
+    '<!-- antennae --><path d="M-2 -24 Q-10 -38 -14 -36" stroke="#6b5b7b" stroke-width="1.5" fill="none" stroke-linecap="round"/>' +
+    '<circle cx="-14" cy="-36" r="2.5" fill="#c9b8e8"/>' +
+    '<path d="M2 -24 Q10 -38 14 -36" stroke="#6b5b7b" stroke-width="1.5" fill="none" stroke-linecap="round"/>' +
+    '<circle cx="14" cy="-36" r="2.5" fill="#f5b8c4"/>' +
+    '</g></svg>';
+  var r=a.getBoundingClientRect();bfX=r.width/2;bfY=r.height/2;tgX=bfX;tgY=bfY;
+  bf.style.left=bfX+'px';bf.style.top=bfY+'px';
+  bf.onclick=function(e){e.stopPropagation();var sp=['✨','💫','🌟','⭐','💖'];for(var i=0;i<5;i++){var tr=document.createElement('div');tr.className='bf-trail';tr.textContent=sp[Math.floor(Math.random()*5)];tr.style.left=(bfX+(Math.random()-.5)*60)+'px';tr.style.top=(bfY+(Math.random()-.5)*60)+'px';a.appendChild(tr);setTimeout(function(el){el.remove()},1500,tr)}
+  [659,784,880,988,1047].forEach(function(n,i){setTimeout(function(){playNote(n,.3,'sine',.1)},i*80)});
+  tgX=50+Math.random()*(r.width-100);tgY=50+Math.random()*(r.height-100)};
+  a.appendChild(bf);
+  (function move(){bfX+=(tgX-bfX)*.02;bfY+=(tgY-bfY)*.02;var wx=Math.sin(Date.now()/1000)*2,wy=Math.cos(Date.now()/800)*1.5;bf.style.left=(bfX+wx)+'px';bf.style.top=(bfY+wy)+'px';if(Math.random()<.003){tgX=50+Math.random()*(r.width-100);tgY=50+Math.random()*(r.height-100)}butterflyAnimFrame=requestAnimationFrame(move)})();
+}
+
+// === 5. BUBBLES ===
+var bubColors=['rgba(245,184,196,.4)','rgba(201,184,232,.4)','rgba(181,232,213,.4)','rgba(252,229,136,.4)','rgba(200,220,255,.4)'];
+function startBubbleAuto(){bubbleInterval=setInterval(function(){if(currentScreen!=='bubble')return;var a=document.getElementById('bubbleArea'),r=a.getBoundingClientRect();mkBub(a,Math.random()*r.width,r.height)},1200)}
+function createBubble(e){initAudio();var a=document.getElementById('bubbleArea'),r=a.getBoundingClientRect(),x=e.clientX-r.left,y=e.clientY-r.top;for(var i=0;i<3;i++)setTimeout(function(xx,yy){mkBub(a,xx,yy)},i*150,x+(Math.random()-.5)*60,y+(Math.random()-.5)*40)}
+function mkBub(area,x,y){
+  var sz=40+Math.random()*50,b=document.createElement('div');b.className='bub';b.style.width=sz+'px';b.style.height=sz+'px';b.style.left=(x-sz/2)+'px';b.style.top=y+'px';b.style.background=bubColors[Math.floor(Math.random()*bubColors.length)];
+  var surp=['◯','○','◦'];
+  b.onclick=function(e){e.stopPropagation();playNote(600,.05);setTimeout(function(){playNote(1200,.1)},30);
+  var p=document.createElement('div');p.className='bub-pop';p.textContent='';p.style.left=this.style.left;p.style.top=this.style.top;p.style.width=sz+'px';p.style.height=sz+'px';p.style.background='rgba(255,255,255,0.3)';p.style.borderRadius='50%';area.appendChild(p);setTimeout(function(){p.remove()},500);this.remove()};
+  area.appendChild(b);setTimeout(function(){if(b.parentNode)b.remove()},6000);
+}
+
+// === 6. FIREFLIES NIGHT ===
+var fireflies=[],ffAnimFrame=null;
+function initNight(){
+  var area=document.getElementById('nightArea');
+  // Keep moon and hint, remove old fireflies
+  area.querySelectorAll('.firefly,.night-star,.night-tree,.ff-burst').forEach(function(el){el.remove()});
+  var r=area.getBoundingClientRect();
+  // Stars
+  for(var i=0;i<20;i++){var s=document.createElement('div');s.className='night-star';s.textContent=['✦','·','✧','⋆'][Math.floor(Math.random()*4)];s.style.left=(5+Math.random()*90)+'%';s.style.top=(3+Math.random()*45)+'%';s.style.fontSize=(6+Math.random()*10)+'px';s.style.animationDelay=(-Math.random()*3)+'s';area.appendChild(s)}
+  // Trees silhouettes
+  var trees=['🌲','🌳','🌿'];
+  for(var i=0;i<6;i++){var t=document.createElement('div');t.className='night-tree';t.textContent=trees[Math.floor(Math.random()*trees.length)];t.style.left=(i*18+Math.random()*8)+'%';t.style.animationDelay=(-Math.random()*4)+'s';area.appendChild(t)}
+  // Create fireflies
+  fireflies=[];
+  for(var i=0;i<15;i++){
+    var ff=document.createElement('div');ff.className='firefly';ff.innerHTML='<div class="firefly-inner"></div>';
+    var fx=30+Math.random()*(r.width-60);
+    var fy=50+Math.random()*(r.height-120);
+    ff.style.left=fx+'px';ff.style.top=fy+'px';
+    ff.style.animationDelay=(-Math.random()*2)+'s';
+    var ffData={el:ff,x:fx,y:fy,tx:fx,ty:fy,lit:false};
+    fireflies.push(ffData);
+    (function(data){
+      ff.onclick=function(e){
+        e.stopPropagation();
+        initAudio();
+        if(data.lit)return;
+        data.lit=true;data.el.classList.add('lit');
+        // Firefly sound - soft high-pitched buzzy twinkle
+        var t=audioCtx.currentTime;
+        var o1=audioCtx.createOscillator(),o2=audioCtx.createOscillator(),g=audioCtx.createGain();
+        o1.type='sine';o2.type='sine';
+        o1.frequency.setValueAtTime(1200,t);o1.frequency.linearRampToValueAtTime(1800,t+.15);o1.frequency.linearRampToValueAtTime(1400,t+.4);
+        o2.frequency.setValueAtTime(1205,t);o2.frequency.linearRampToValueAtTime(1805,t+.15);o2.frequency.linearRampToValueAtTime(1405,t+.4);
+        g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(.08,t+.02);g.gain.setValueAtTime(.06,t+.2);g.gain.exponentialRampToValueAtTime(.001,t+.5);
+        o1.connect(g);o2.connect(g);g.connect(masterGain);o1.start(t);o2.start(t);o1.stop(t+.6);o2.stop(t+.6);
+        // Sparkle burst
+        var sp=['✨','💫','🌟'];
+        for(var k=0;k<3;k++){var b=document.createElement('div');b.className='ff-burst';b.textContent=sp[k];b.style.left=(data.x+(Math.random()-.5)*30)+'px';b.style.top=(data.y+(Math.random()-.5)*30)+'px';area.appendChild(b);setTimeout(function(el){el.remove()},1000,b)}
+        // Unlit after 4 seconds, drift gently
+        setTimeout(function(){data.lit=false;data.el.classList.remove('lit')},4000);
+      }
+    })(ffData);
+    area.appendChild(ff);
+  }
+  // Animate fireflies floating
+  function moveFF(){
+    if(currentScreen!=='night'){ffAnimFrame=null;return}
+    fireflies.forEach(function(f){
+      if(!f.lit){
+        f.x+=(f.tx-f.x)*.004;f.y+=(f.ty-f.y)*.004;
+        f.x+=Math.sin(Date.now()/2000+fireflies.indexOf(f))*0.15;
+        f.y+=Math.cos(Date.now()/1600+fireflies.indexOf(f)*2)*0.1;
+        f.el.style.left=f.x+'px';f.el.style.top=f.y+'px';
+        if(Math.random()<.002){f.tx=30+Math.random()*(r.width-60);f.ty=50+Math.random()*(r.height-120)}
+      }
+    });
+    ffAnimFrame=requestAnimationFrame(moveFF);
+  }
+  moveFF();
+  // Play owl sound in background
+  if(audioCtx){(function owlBg(){if(currentScreen!=='night')return;var t=audioCtx.currentTime;var o=audioCtx.createOscillator(),g=audioCtx.createGain();o.type='sine';o.frequency.setValueAtTime(360,t);o.frequency.linearRampToValueAtTime(300,t+.4);g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(.1,t+.05);g.gain.setValueAtTime(.1,t+.3);g.gain.exponentialRampToValueAtTime(.001,t+.5);o.connect(g);g.connect(masterGain);o.start(t);o.stop(t+.6);setTimeout(owlBg,4000+Math.random()*5000)})()}
+}
+// Hook into openScreen
+var _origOpen=openScreen;
+openScreen=function(n){_origOpen(n);if(n==='night')initNight()};
+var _origHome=goHome;
+goHome=function(){if(ffAnimFrame){cancelAnimationFrame(ffAnimFrame);ffAnimFrame=null}_origHome()};
+
+// === 7. COMMUNICATION BOARD ===
+var commTimeout=null;
+function commTap(btn,emoji,fullText,shortName){
+  initAudio();
+  // Button animation - clear previous
+  document.querySelectorAll('.comm-btn').forEach(function(b){b.classList.remove('pressed')});
+  void btn.offsetWidth;btn.classList.add('pressed');
+  setTimeout(function(){btn.classList.remove('pressed')},700);
+  // Sound
+  [440,523,659].forEach(function(n,i){setTimeout(function(){playNote(n,.3,'triangle',.15)},i*80)});
+  // Show message popup
+  document.getElementById('commMsgEmoji').textContent=emoji;
+  document.getElementById('commMsgText').textContent=fullText.replace(/[\u0591-\u05C7]/g,'');
+  var msg=document.getElementById('commMsg');
+  msg.classList.add('show');
+  // Speak it
+  if(!voiceMuted&&'speechSynthesis' in window){
+    speechSynthesis.cancel();
+    var u=new SpeechSynthesisUtterance(fullText);
+    u.lang='he-IL';u.rate=0.7;u.pitch=1.1;u.volume=1;
+    var fv=getFemaleHebrewVoice();if(fv)u.voice=fv;
+    speechSynthesis.speak(u);
+  }
+  // Auto-hide after 3 seconds
+  if(commTimeout)clearTimeout(commTimeout);
+  commTimeout=setTimeout(function(){msg.classList.remove('show')},3000);
+  // Or tap to dismiss
+  msg.onclick=function(){msg.classList.remove('show');if(commTimeout)clearTimeout(commTimeout)};
+}
+
+// === 8. SIGNS & SYMBOLS SCREENS ===
+var signsData=[{e:'👋',n:'שָׁלוֹם',x:'מנופפים ביד!'},{e:'🤟',n:'אֲנִי אוֹהֵב אוֹתְךָ',x:'שפת סימנים!'},{e:'👍',n:'מְעוּלֶה',x:'אגודל למעלה!'},{e:'👏',n:'כׇּל הַכָּבוֹד',x:'מוחאים כפיים!'},{e:'🙏',n:'בְּבַקָּשָׁה / תּוֹדָה',x:'כפות ידיים צמודות'},{e:'👆',n:'לְמַעְלָה',x:'מצביעים למעלה!'},{e:'👇',n:'לְמַטָּה',x:'מצביעים למטה!'},{e:'🤝',n:'שָׁלוֹם וּבְרָכָה',x:'לוחצים ידיים!'},{e:'✌️',n:'שָׁלוֹם / נִצָּחוֹן',x:'שתי אצבעות!'},{e:'🫶',n:'לֵב',x:'עושים לב עם הידיים!'}];
+var symbolsData=[{e:'🔥',n:'חַם',x:'לא נוגעים! כואב!'},{e:'🧊',n:'קַר',x:'בררר! קר מאוד!'},{e:'⚡',n:'חַשְׁמַל',x:'מסוכן! לא נוגעים!'},{e:'🚗',n:'כְּבִישׁ',x:'עוצרים ומסתכלים!'},{e:'🐕',n:'כֶּלֶב זָר',x:'לא מלטפים בלי רשות!'},{e:'💊',n:'תְּרוּפָה',x:'רק מאמא או אבא!'},{e:'🔪',n:'חַד',x:'סכין חדה! לא נוגעים!'},{e:'🌊',n:'מַיִם עֲמוּקִים',x:'רק עם מבוגר!'},{e:'☀️',n:'שֶׁמֶשׁ חֲזָקָה',x:'שמים כובע וקרם!'},{e:'🍄',n:'לֹא אוֹכְלִים',x:'לא טועמים דברים מהרצפה!'}];
+var signsIdx=0,symbolsIdx=0;
+
+function initSigns(){signsIdx=0;updateSigns()}
+function initSymbols(){symbolsIdx=0;updateSymbols()}
+
+function updateSigns(){
+  var it=signsData[signsIdx];
+  document.getElementById('signsEmoji').textContent=it.e;
+  document.getElementById('signsName').textContent=it.n;
+  document.getElementById('signsExtra').textContent=it.x;
+  document.getElementById('signsCounter').textContent=(signsIdx+1)+' / '+signsData.length;
+  var prog=document.getElementById('signsProg');prog.innerHTML='';
+  for(var i=0;i<signsData.length;i++){var d=document.createElement('div');d.className='p-dot';if(i===signsIdx)d.classList.add('cur');prog.appendChild(d)}
+}
+function updateSymbols(){
+  var it=symbolsData[symbolsIdx];
+  document.getElementById('symbolsEmoji').textContent=it.e;
+  document.getElementById('symbolsName').textContent=it.n;
+  document.getElementById('symbolsExtra').textContent=it.x;
+  document.getElementById('symbolsCounter').textContent=(symbolsIdx+1)+' / '+symbolsData.length;
+  var prog=document.getElementById('symbolsProg');prog.innerHTML='';
+  for(var i=0;i<symbolsData.length;i++){var d=document.createElement('div');d.className='p-dot';if(i===symbolsIdx)d.classList.add('cur');prog.appendChild(d)}
+}
+function signsNav(dir){signsIdx=(signsIdx+dir+signsData.length)%signsData.length;updateSigns();playNote(523,.15);setTimeout(function(){speakGeneric(signsData[signsIdx])},300)}
+function symbolsNav(dir){symbolsIdx=(symbolsIdx+dir+symbolsData.length)%symbolsData.length;updateSymbols();playNote(523,.15);setTimeout(function(){speakGeneric(symbolsData[symbolsIdx])},300)}
+function onSignsTap(){initAudio();var c=document.getElementById('signsCard');c.classList.remove('bounce');void c.offsetWidth;c.classList.add('bounce');[523,659,784].forEach(function(n,i){setTimeout(function(){playNote(n,.4,'triangle',.15)},i*100)});speakGeneric(signsData[signsIdx])}
+function onSymbolsTap(){initAudio();var c=document.getElementById('symbolsCard');c.classList.remove('bounce');void c.offsetWidth;c.classList.add('bounce');[523,659,784].forEach(function(n,i){setTimeout(function(){playNote(n,.4,'triangle',.15)},i*100)});speakGeneric(symbolsData[symbolsIdx])}
+function speakGeneric(it){
+  if(voiceMuted||!('speechSynthesis' in window))return;speechSynthesis.cancel();
+  var name=it.n.replace(/\//g,' או ');
+  var u=new SpeechSynthesisUtterance(name);u.lang='he-IL';u.rate=0.7;u.pitch=1.1;u.volume=1;
+  var fv=getFemaleHebrewVoice();if(fv)u.voice=fv;
+  speechSynthesis.speak(u);
+}
+
+// Hook into openScreen for signs/symbols init
+var __origOpen2=openScreen;
+openScreen=function(n){__origOpen2(n);if(n==='signs')initSigns();if(n==='symbols')initSymbols()};
+
+// === 8. LEARNING ===
+var learnData={
+  animals:[{e:'🐱',n:'חָתוּל',x:'אומר מיאו!'},{e:'🐶',n:'כֶּלֶב',x:'אומר הב הב!'},{e:'🐰',n:'אַרְנָב',x:'אוהב לקפוץ!'},{e:'🦋',n:'פַּרְפַּר',x:'עף בין הפרחים'},{e:'🐞',n:'חִפּוּשִׁית',x:'קטנה ואדומה!'},{e:'🐦',n:'צִפּוֹר',x:'שרה שירים!'},{e:'🐢',n:'צָב',x:'הולך לאט לאט'},{e:'🐟',n:'דָּג',x:'שוחה במים!'},{e:'🦔',n:'קִפּוֹד',x:'עגול וחמוד!'},{e:'🐸',n:'צְפַרְדֵּעַ',x:'קופצת! קרר קרר'}],
+  colors:[{e:'🔴',n:'אָדוֹם',x:'כמו תפוח! 🍎'},{e:'🟠',n:'כָּתוֹם',x:'כמו תפוז! 🍊'},{e:'🟡',n:'צָהוֹב',x:'כמו השמש! ☀️'},{e:'🟢',n:'יָרוֹק',x:'כמו עלה! 🍃'},{e:'🔵',n:'כָּחוֹל',x:'כמו השמיים! 🌤️'},{e:'🟣',n:'סָגוֹל',x:'כמו פרח! 🪻'},{e:'🩷',n:'וָרוֹד',x:'כמו פרפר! 🌸'},{e:'🤎',n:'חוּם',x:'כמו שוקולד! 🍫'},{e:'⚪',n:'לָבָן',x:'כמו עננים! ☁️'}],
+  numbers:[{e:'1️⃣',n:'אַחַת',x:'פרח אחד 🌸'},{e:'2️⃣',n:'שְׁתַּיִם',x:'שני פרפרים 🦋🦋'},{e:'3️⃣',n:'שָׁלוֹשׁ',x:'שלושה כוכבים ⭐⭐⭐'},{e:'4️⃣',n:'אַרְבַּע',x:'ארבעה לבבות 💖💖💖💖'},{e:'5️⃣',n:'חָמֵשׁ',x:'חמישה פרחים 🌷🌷🌷🌷🌷'},{e:'6️⃣',n:'שֵׁשׁ',x:'שש ציפורים 🐦🐦🐦🐦🐦🐦'},{e:'7️⃣',n:'שֶׁבַע',x:'שבעה צבעים בקשת! 🌈'},{e:'8️⃣',n:'שְׁמוֹנֶה',x:'שמונה רגליים לתמנון 🐙'},{e:'9️⃣',n:'תֵּשַׁע',x:'תשעה בלונים 🎈'},{e:'🔟',n:'עֶשֶׂר',x:'עשר אצבעות! 🙌'}],
+  shapes:[{e:'⭕',n:'עִיגּוּל',x:'עגול כמו השמש! ☀️'},{e:'🔷',n:'מְעוּיָן',x:'כמו יהלום! 💎'},{e:'⬛',n:'רִבּוּעַ',x:'כל הצדדים שווים! 📦'},{e:'🔺',n:'מְשׁוּלָשׁ',x:'יש לו שלוש פינות! ⛰️'},{e:'⭐',n:'כּוֹכָב',x:'זורח בשמיים! ✨'},{e:'💖',n:'לֵב',x:'סמל של אהבה! 🥰'},{e:'🌙',n:'סַהַר',x:'הירח בלילה! 🌃'}],
+  fruits:[{e:'🍎',n:'תַּפּוּחַ',x:'אדום ומתוק! 🌳'},{e:'🍌',n:'בָּנָנָה',x:'צהובה וטעימה! 🐒'},{e:'🍊',n:'תַּפּוּז',x:'כתום ועסיסי! 🧃'},{e:'🍓',n:'תּוּת',x:'קטן ואדום! 🌿'},{e:'🍇',n:'עֲנָבִים',x:'סגולים ומתוקים! 🍷'},{e:'🍉',n:'אֲבַטִּיחַ',x:'גדול וירוק! ☀️'},{e:'🥝',n:'קִיוִי',x:'ירוק מבפנים! 🟢'},{e:'🍑',n:'אֲפַרְסֵק',x:'רך ומתוק! 🌸'},{e:'🫐',n:'אוּכְמָנִיּוֹת',x:'כחולות קטנטנות! 💙'}]
+};
+var curTab='animals',curIdx=0,visited=new Set();
+function initLearn(){curTab='animals';curIdx=0;visited=new Set();visited.add(0);updateCard()}
+function switchLearnTab(tab,btn){document.querySelectorAll('.l-tab').forEach(function(t){t.classList.remove('active')});btn.classList.add('active');curTab=tab;curIdx=0;visited=new Set();visited.add(0);updateCard();playNote(523,.15)}
+function updateCard(){
+  var items=learnData[curTab],it=items[curIdx];
+  document.getElementById('learnEmoji').textContent=it.e;
+  document.getElementById('learnName').textContent=it.n;
+  document.getElementById('learnExtra').textContent=it.x;
+  document.getElementById('learnCounter').textContent=(curIdx+1)+' / '+items.length;
+  var prog=document.getElementById('learnProgress');prog.innerHTML='';
+  for(var i=0;i<items.length;i++){var d=document.createElement('div');d.className='p-dot';if(i===curIdx)d.classList.add('cur');else if(visited.has(i))d.classList.add('vis');prog.appendChild(d)}
+}
+function onLearnCardTap(){
+  initAudio();var card=document.getElementById('learnCard');card.classList.remove('bounce');void card.offsetWidth;card.classList.add('bounce');
+  [523,659,784].forEach(function(n,i){setTimeout(function(){playNote(n,.4,'triangle',.15)},i*100)});
+  speakItem();
+}
+function speakItem(){
+  if(voiceMuted||!('speechSynthesis' in window))return;
+  speechSynthesis.cancel();
+  var it=learnData[curTab][curIdx];
+  var name=it.n.replace(/\//g,' או ');
+  var u=new SpeechSynthesisUtterance(name);
+  u.lang='he-IL';u.rate=0.7;u.pitch=1.1;u.volume=1;
+  var fv=getFemaleHebrewVoice();if(fv)u.voice=fv;
+  speechSynthesis.speak(u);
+}
+// Preload voices
+var cachedVoice=null;
+function getFemaleHebrewVoice(){
+  if(cachedVoice)return cachedVoice;
+  var voices=speechSynthesis.getVoices();
+  var heVoices=voices.filter(function(v){return v.lang&&(v.lang.indexOf('he')===0||v.lang.indexOf('iw')===0)});
+  var female=null;
+  var femaleNames=['carmit','lihi','yael','michal','tali','efrat','noa','female','woman'];
+  for(var i=0;i<heVoices.length;i++){
+    var n=heVoices[i].name.toLowerCase();
+    for(var j=0;j<femaleNames.length;j++){if(n.indexOf(femaleNames[j])>-1){female=heVoices[i];break}}
+    if(female)break;
+  }
+  cachedVoice=female||heVoices[0]||null;
+  return cachedVoice;
+}
+if('speechSynthesis' in window){speechSynthesis.getVoices();speechSynthesis.onvoiceschanged=function(){cachedVoice=null;speechSynthesis.getVoices()}}
+function learnNext(){var items=learnData[curTab];curIdx=(curIdx+1)%items.length;visited.add(curIdx);updateCard();playNote(523,.15);setTimeout(speakItem,300)}
+function learnPrev(){var items=learnData[curTab];curIdx=(curIdx-1+items.length)%items.length;visited.add(curIdx);updateCard();playNote(440,.15);setTimeout(speakItem,300)}
+
+// prevent zoom
+var lte=0;document.addEventListener('touchend',function(e){var n=Date.now();if(n-lte<=300)e.preventDefault();lte=n},false);
+</script>
+</body>
+</html>
